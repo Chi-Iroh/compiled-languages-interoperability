@@ -7,3 +7,4 @@ void f90_hello(void);
 void hs_hello(void);
 void rs_hello(void);
 void go_hello(void);
+void ada_hello(void);
