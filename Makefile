@@ -20,6 +20,9 @@ obj/%.S.o: src/%.S
 obj/%.hs.o: src/%.hs
 	ghc -c $< -o $@ -hidir obj -stubdir obj
 
+obj/%.rs.o: src/%.rs
+	rustc --crate-type=staticlib -C panic=abort $< -o $@
+
 .PHONY: clean
 clean:
 	rm -f $(OBJ) a.out

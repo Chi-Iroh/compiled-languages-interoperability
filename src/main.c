@@ -10,4 +10,6 @@ int main(int argc, char* argv[]) {
     hs_init(&argc, &argv);
     hs_hello();
     hs_exit();
+
+    rs_hello();
 }
