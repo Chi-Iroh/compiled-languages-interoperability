@@ -8,6 +8,7 @@ int main(int argc, char* argv[]) {
     cpp_hello();
 
     f90_hello();
+    go_hello();
 
     hs_init(&argc, &argv);
     hs_hello();
