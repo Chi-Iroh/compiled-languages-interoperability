@@ -7,6 +7,8 @@ int main(int argc, char* argv[]) {
     c_hello();
     cpp_hello();
 
+    f90_hello();
+
     hs_init(&argc, &argv);
     hs_hello();
     hs_exit();
