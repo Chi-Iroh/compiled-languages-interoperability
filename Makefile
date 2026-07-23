@@ -76,7 +76,7 @@ obj/%.cbl.o: src/%.cbl
 
 .PHONY: clean
 clean:
-	rm -f $(OBJ) $(LIB) a.out
+	rm -f $(OBJ) $(LIB) $(EXE)
 
 .PHONY: re
-re: clean a.out
+re: clean $(EXE)
