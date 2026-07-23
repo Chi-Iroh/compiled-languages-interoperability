@@ -14,6 +14,9 @@ int main(int argc, char* argv[]) {
 
     asm_hello();
     c_hello();
+
+    cbl_hello();
+
     cpp_hello();
 
     __managed__Startup();

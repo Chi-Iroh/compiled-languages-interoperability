@@ -9,3 +9,4 @@ void rs_hello(void);
 void go_hello(void);
 void ada_hello(void);
 extern void cs_hello(void);
+void cbl_hello(void);

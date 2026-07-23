@@ -9,6 +9,7 @@ F90_SRC = $(wildcard src/*.f90)
 GO_SRC = $(wildcard src/*.go)
 ADA_SRC = $(wildcard src/*.adb)
 CS_SRC = $(wildcard src/*.cs)
+CBL_SRC = $(wildcard src/*.cbl)
 
 C_OBJ = $(patsubst src/%.c,obj/%.c.o,$(C_SRC))
 CPP_OBJ = $(patsubst src/%.cpp,obj/%.cpp.o,$(CPP_SRC))
@@ -17,12 +18,13 @@ HS_OBJ = $(patsubst src/%.hs,obj/%.hs.o,$(HS_SRC))
 F90_OBJ = $(patsubst src/%.f90,obj/%.f90.o,$(F90_SRC))
 # Ada is extremely strict about .o names, they must exactly match .adb name, thus .adb.o won't work !
 ADA_OBJ = $(patsubst src/%.adb,obj/%.o,$(ADA_SRC)) $(patsubst src/%.adb,obj/b~%.o,$(ADA_SRC))
+CBL_OBJ = $(patsubst src/%.cbl,obj/%.cbl.o,$(CBL_SRC))
 
 RS_LIB = $(patsubst src/%.rs,obj/%.rs.a,$(RS_SRC))
 GO_LIB = $(patsubst src/%.go,obj/%.go.a,$(GO_SRC))
 CS_LIB = $(patsubst src/%.cs,obj/%.cs.a,$(CS_SRC))
 
-OBJ = $(C_OBJ) $(CPP_OBJ) $(S_OBJ) $(HS_OBJ) $(F90_OBJ) $(ADA_OBJ)
+OBJ = $(C_OBJ) $(CPP_OBJ) $(S_OBJ) $(HS_OBJ) $(F90_OBJ) $(ADA_OBJ) $(CBL_OBJ)
 LIB = $(RS_LIB) $(GO_LIB) $(CS_LIB)
 
 CS_RUNTIME=10
@@ -35,7 +37,7 @@ CS_STD_LIB = $(foreach dep,$(CS_STD_DEPS),$(CS_STD_LIB_ROOT)/$(dep))
 EXE = a.out
 
 $(EXE): $(OBJ) $(LIB)
-	ghc $(OBJ) -o $(EXE) -lstdc++ -no-pie -no-hs-main -lgfortran $(LIB) -lgnat -lm $(CS_STD_LIB)
+	ghc $(OBJ) -o $(EXE) -lstdc++ -no-pie -no-hs-main -lgfortran $(LIB) -lgnat -lm -lgcobol $(CS_STD_LIB)
 
 obj/%.c.o: src/%.c
 	mkdir -p $(shell dirname $@)
@@ -68,6 +70,9 @@ obj/b~%.o: src/%.adb
 
 obj/%.cs.a: src/%.cs
 	dotnet publish -p:PublishAot=true -p:OutputType=Library -p:TargetFramework=net$(CS_RUNTIME).0 -p:NativeLib=Static -r linux-x64 -p:DebugType=None -p:DebugSymbols=false -p:NativeDebugSymbols=false -p:StripSymbols=true -p:AssemblyName=$(shell basename $@ .a) $< -o $(shell dirname $@)
+
+obj/%.cbl.o: src/%.cbl
+	gcobol -c $< -o $@
 
 .PHONY: clean
 clean:
