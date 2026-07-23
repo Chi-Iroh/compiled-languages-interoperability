@@ -5,6 +5,8 @@
 void adainit(void);
 void adafinal(void);
 
+void __managed__Startup(void);
+
 int main(int argc, char* argv[]) {
     adainit();
     ada_hello();
@@ -13,6 +15,9 @@ int main(int argc, char* argv[]) {
     asm_hello();
     c_hello();
     cpp_hello();
+
+    __managed__Startup();
+    cs_hello();
 
     f90_hello();
     go_hello();
