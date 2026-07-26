@@ -34,10 +34,12 @@ CS_STD_LIB_ROOT = $(shell find "$(CS_NUGET_ROOT)microsoft.netcore.app.runtime.na
 CS_STD_DEPS = libbootstrapperdll.o libRuntime.WorkstationGC.a libeventpipe-disabled.a libRuntime.VxsortDisabled.a libstandalonegc-disabled.a libSystem.Native.a libSystem.IO.Compression.Native.a libSystem.Globalization.Native.a libaotminipal.a libstdc++compat.a libz.a
 CS_STD_LIB = $(foreach dep,$(CS_STD_DEPS),$(CS_STD_LIB_ROOT)/$(dep))
 
+GHC_LDFLAGS_OUTPUT = obj/ghc_ldflags.log
+
 EXE = a.out
 
 $(EXE): $(OBJ) $(LIB)
-	ghc $(OBJ) -o $(EXE) -lstdc++ -no-pie -no-hs-main -lgfortran $(LIB) -lgnat -lm -lgcobol $(CS_STD_LIB)
+	gcc $(OBJ) -o $(EXE) -lstdc++ -no-pie -lgfortran $(LIB) -lgnat -lm -lgcobol $(CS_STD_LIB) $(shell cat $(GHC_LDFLAGS_OUTPUT))
 
 obj/%.c.o: src/%.c
 	mkdir -p $(shell dirname $@)
@@ -50,7 +52,9 @@ obj/%.S.o: src/%.S
 	nasm $< -felf64 -o $@
 
 obj/%.hs.o: src/%.hs
+	export GHC_LDFLAGS_OUTPUT=$(GHC_LDFLAGS_OUTPUT)
 	ghc -c $< -o $@ -hidir obj -stubdir obj
+	ghc $@ -o dummy.out -no-hs-main -no-pie -pgml ./get_ghc_ldflags.py
 
 obj/%.rs.a: src/%.rs
 	rustc --crate-type=staticlib -C panic=abort $< -o $@
