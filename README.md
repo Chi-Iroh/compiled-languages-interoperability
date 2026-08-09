@@ -13,3 +13,10 @@ The program entry point is in C (`main()` function), and it calls individual fun
 - Go
 - Haskell
 - Rust
+
+# Run
+
+On Fedora, install those packages :  
+```bash
+sudo dnf install dotnet-sdk-10.0 gfortran gnat gcobol rust go ghc
+```
