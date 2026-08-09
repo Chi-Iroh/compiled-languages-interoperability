@@ -30,7 +30,10 @@ sudo dnf install docker
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# Run Docker image
-sudo docker build . -t compiled-languages-interoperability:latest
-sudo docker run compiled-languages-interoperability
+# Run Docker images
+sudo bash -c $'
+for distribution in archlinux fedora; do\n
+    docker build -f docker-images/$distribution.docker . -t compiled-languages-interoperability-$distribution:latest || exit 1\n
+    docker run compiled-languages-interoperability-$distribution || exit 1\n
+done' && echo "Everything is fine."
 ```

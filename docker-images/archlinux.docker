@@ -1,0 +1,7 @@
+FROM archlinux
+
+RUN ["pacman", "-Sy", "--noconfirm", "make", "dotnet-sdk", "gcc-fortran", "gcc-ada", "gcc-gcobol", "rust", "go", "ghc"]
+WORKDIR /
+COPY . .
+RUN ["make"]
+CMD ["./a.out"]
