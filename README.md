@@ -20,3 +20,17 @@ On Fedora, install those packages :
 ```bash
 sudo dnf install dotnet-sdk-10.0 gfortran gnat gcobol rust go ghc
 ```
+
+To use Docker images :  
+```bash
+# Install Docker
+sudo dnf install docker
+
+# Initialize Docker
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# Run Docker image
+sudo docker build . -t compiled-languages-interoperability:latest
+sudo docker run compiled-languages-interoperability
+```

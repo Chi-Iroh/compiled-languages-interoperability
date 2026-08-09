@@ -39,7 +39,7 @@ GHC_LDFLAGS_OUTPUT = obj/ghc_ldflags.log
 EXE = a.out
 
 $(EXE): $(OBJ) $(LIB)
-	gcc $(OBJ) -o $(EXE) -lstdc++ -no-pie -lgfortran $(LIB) -lgnat -lm -lgcobol $(CS_STD_LIB) $(shell cat $(GHC_LDFLAGS_OUTPUT))
+	gcc $(OBJ) -o $(EXE) -lstdc++ -no-pie -lgfortran $(LIB) -lgnat-$(shell gcc -dumpversion) -lm -lgcobol $(CS_STD_LIB) $(shell cat $(GHC_LDFLAGS_OUTPUT))
 
 obj/%.c.o: src/%.c
 	mkdir -p $(shell dirname $@)
@@ -52,9 +52,8 @@ obj/%.S.o: src/%.S
 	nasm $< -felf64 -o $@
 
 obj/%.hs.o: src/%.hs
-	export GHC_LDFLAGS_OUTPUT=$(GHC_LDFLAGS_OUTPUT)
 	ghc -c $< -o $@ -hidir obj -stubdir obj
-	ghc $@ -o dummy.out -no-hs-main -no-pie -pgml ./get_ghc_ldflags.py
+	GHC_LDFLAGS_OUTPUT=$(GHC_LDFLAGS_OUTPUT) ghc $@ -o dummy.out -no-hs-main -no-pie -pgml ./get_ghc_ldflags.py
 
 obj/%.rs.a: src/%.rs
 	rustc --crate-type=staticlib -C panic=abort $< -o $@
