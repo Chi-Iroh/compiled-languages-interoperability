@@ -1,7 +1,12 @@
 FROM fedora
 
-RUN ["dnf", "install", "-y", "make", "dotnet-sdk-10.0", "gfortran", "gnat", "gcobol", "rust", "go", "ghc"]
-WORKDIR /
-COPY . .
+RUN dnf install -y make dotnet-sdk-10.0 gfortran gnat gcobol rust go ghc nasm python3 which
+
+WORKDIR /compiled-languages-interoperability
+COPY include include
+COPY src src
+COPY scripts scripts
+COPY Makefile .
+
 RUN ["make"]
 CMD ["./a.out"]

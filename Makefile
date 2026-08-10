@@ -38,7 +38,7 @@ GHC_LDFLAGS_OUTPUT = obj/ghc_ldflags.log
 
 EXE = a.out
 
-$(EXE): $(OBJ) $(LIB)
+$(EXE): check-cs-nativeaot $(OBJ) $(LIB)
 	gcc $(OBJ) -o $(EXE) -lstdc++ -no-pie -lgfortran $(LIB) -lgnat-$(shell gcc -dumpversion) -lm -lgcobol $(CS_STD_LIB) $(shell cat $(GHC_LDFLAGS_OUTPUT))
 
 obj/%.c.o: src/%.c
@@ -53,7 +53,7 @@ obj/%.S.o: src/%.S
 
 obj/%.hs.o: src/%.hs
 	ghc -c $< -o $@ -hidir obj -stubdir obj
-	GHC_LDFLAGS_OUTPUT=$(GHC_LDFLAGS_OUTPUT) ghc $@ -o dummy.out -no-hs-main -no-pie -pgml ./get_ghc_ldflags.py
+	GHC_LDFLAGS_OUTPUT=$(GHC_LDFLAGS_OUTPUT) ghc $@ -o dummy.out -no-hs-main -no-pie -pgml ./scripts/get_ghc_ldflags.py
 
 obj/%.rs.a: src/%.rs
 	rustc --crate-type=staticlib -C panic=abort $< -o $@
@@ -68,7 +68,16 @@ obj/%.o: src/%.adb
 	gcc -c $< -o $@
 
 obj/b~%.o: src/%.adb
-	cd obj && gnatbind -n $(patsubst src/%.adb,%.ali,$<) -o $(patsubst src/%.adb,b~%.adb,$<)
+	bash -c $$' \
+	if which gnat; then\n \
+		gnat=gnat\n \
+	elif which gnat-$$(gcc -dumpversion); then\n \
+		gnat=gnat-$$(gcc -dumpversion)\n \
+	else\n \
+		echo "Cannot find gnat !" >&2\n \
+		exit 1\n \
+	fi\n \
+	cd obj && $$gnat bind -n $(patsubst src/%.adb,%.ali,$<) -o $(patsubst src/%.adb,b~%.adb,$<)'
 	gcc -c $(patsubst src/%.adb,obj/b~%.adb,$<) -o $(patsubst src/%.adb,obj/b~%.o,$<)
 
 obj/%.cs.a: src/%.cs
@@ -83,3 +92,41 @@ clean:
 
 .PHONY: re
 re: clean $(EXE)
+
+.PHONY:check-cs-nativeaot
+check-cs-nativeaot:
+	if [[ "$(CS_STD_LIB_ROOT)" = "" ]]; then \
+		$(MAKE) cs-download-nativeaot; \
+	fi
+
+.PHONY: cs-download-nativeaot
+cs-download-nativeaot:
+	dir=$(shell mktemp -d) && \
+	cd $$dir && \
+	echo $$'<Project Sdk="Microsoft.NET.Sdk">\n\t<PropertyGroup>\n\t\t<TargetFramework>net$(CS_RUNTIME).0</TargetFramework>\n\t\t<RuntimeIdentifier>linux-x64</RuntimeIdentifier>\n\t\t<PublishAot>true</PublishAot>\n\t</PropertyGroup>\n</Project>' > $$(basename $$dir).csproj && \
+	dotnet publish -p:PublishAot=true && \
+	cd - && \
+	rm $$dir -rf
+
+DOCKER_DISTRIBUTIONS=archlinux fedora ubuntu
+
+.PHONY: docker
+docker:
+	sudo bash -c $$' \
+	for distribution in $(DOCKER_DISTRIBUTIONS); do\n \
+		docker build . -f docker-images/$$distribution.docker -t compiled-languages-interoperability-$$distribution:latest || exit 1\n \
+		docker run compiled-languages-interoperability-$$distribution || exit 1\n \
+		echo "$$distribution image works."\n \
+	done' && echo "All images are successfully built."
+
+.PHONY: docker-clean
+docker-clean:
+	sudo bash -c $$' \
+	for distribution in $(DOCKER_DISTRIBUTIONS); do\n \
+		containers=$$(docker container ls -aq --filter ancestor=compiled-languages-interoperability-$$distribution || exit 1)\n \
+		if [[ "$$containers" != "" ]]; then\n \
+			docker container rm $$containers || exit 1\n \
+		fi\n \
+		docker image rm compiled-languages-interoperability-$$distribution || exit 1\n \
+		echo "$$distribution image successfully deleted."\n \
+	done' && echo "All images are successfully removed."

@@ -21,7 +21,9 @@ On Fedora, install those packages :
 sudo dnf install dotnet-sdk-10.0 gfortran gnat gcobol rust go ghc
 ```
 
-To use Docker images :  
+The build is tested with Docker images.  
+Beware, they will take a LOT of disk space as many languages toolchains are installed.  
+Here are the commands :  
 ```bash
 # Install Docker
 sudo dnf install docker
@@ -30,10 +32,9 @@ sudo dnf install docker
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# Run Docker images
-sudo bash -c $'
-for distribution in archlinux fedora; do\n
-    docker build -f docker-images/$distribution.docker . -t compiled-languages-interoperability-$distribution:latest || exit 1\n
-    docker run compiled-languages-interoperability-$distribution || exit 1\n
-done' && echo "Everything is fine."
+# Run Docker images (takes a LOT of disk space)
+make docker
+
+# Remove Docker images (frees disk space)
+make docker-clean
 ```
