@@ -10,6 +10,7 @@ GO_SRC = $(wildcard src/*.go)
 ADA_SRC = $(wildcard src/*.adb)
 CS_SRC = $(wildcard src/*.cs)
 CBL_SRC = $(wildcard src/*.cbl)
+D_SRC = $(wildcard src/*.d)
 
 C_OBJ = $(patsubst src/%.c,obj/%.c.o,$(C_SRC))
 CPP_OBJ = $(patsubst src/%.cpp,obj/%.cpp.o,$(CPP_SRC))
@@ -19,12 +20,13 @@ F90_OBJ = $(patsubst src/%.f90,obj/%.f90.o,$(F90_SRC))
 # Ada is extremely strict about .o names, they must exactly match .adb name, thus .adb.o won't work !
 ADA_OBJ = $(patsubst src/%.adb,obj/%.o,$(ADA_SRC)) $(patsubst src/%.adb,obj/b~%.o,$(ADA_SRC))
 CBL_OBJ = $(patsubst src/%.cbl,obj/%.cbl.o,$(CBL_SRC))
+D_OBJ = $(patsubst src/%.d,obj/%.d.o,$(D_SRC))
 
 RS_LIB = $(patsubst src/%.rs,obj/%.rs.a,$(RS_SRC))
 GO_LIB = $(patsubst src/%.go,obj/%.go.a,$(GO_SRC))
 CS_LIB = $(patsubst src/%.cs,obj/%.cs.a,$(CS_SRC))
 
-OBJ = $(C_OBJ) $(CPP_OBJ) $(S_OBJ) $(HS_OBJ) $(F90_OBJ) $(ADA_OBJ) $(CBL_OBJ)
+OBJ = $(C_OBJ) $(CPP_OBJ) $(S_OBJ) $(HS_OBJ) $(F90_OBJ) $(ADA_OBJ) $(CBL_OBJ) $(D_OBJ)
 LIB = $(RS_LIB) $(GO_LIB) $(CS_LIB)
 
 CS_RUNTIME=10
@@ -34,12 +36,14 @@ CS_STD_LIB_ROOT = $(shell find "$(CS_NUGET_ROOT)microsoft.netcore.app.runtime.na
 CS_STD_DEPS = libbootstrapperdll.o libRuntime.WorkstationGC.a libeventpipe-disabled.a libRuntime.VxsortDisabled.a libstandalonegc-disabled.a libSystem.Native.a libSystem.IO.Compression.Native.a libSystem.Globalization.Native.a libaotminipal.a libstdc++compat.a libz.a
 CS_STD_LIB = $(foreach dep,$(CS_STD_DEPS),$(CS_STD_LIB_ROOT)/$(dep))
 
+D_STD_LIB = -lphobos2-ldc-shared -ldruntime-ldc-shared
+
 GHC_LDFLAGS_OUTPUT = obj/ghc_ldflags.log
 
 EXE = a.out
 
 $(EXE): check-cs-nativeaot $(OBJ) $(LIB)
-	gcc $(OBJ) -o $(EXE) -lstdc++ -no-pie -lgfortran $(LIB) -lgnat-$(shell gcc -dumpversion) -lm -lgcobol $(CS_STD_LIB) $(shell cat $(GHC_LDFLAGS_OUTPUT))
+	gcc $(OBJ) -o $(EXE) -lstdc++ -no-pie -lgfortran $(LIB) -lgnat-$(shell gcc -dumpversion) -lm -lgcobol $(CS_STD_LIB) $(shell cat $(GHC_LDFLAGS_OUTPUT)) $(D_STD_LIB)
 
 obj/%.c.o: src/%.c
 	mkdir -p $(shell dirname $@)
@@ -85,6 +89,9 @@ obj/%.cs.a: src/%.cs
 
 obj/%.cbl.o: src/%.cbl
 	gcobol -c $< -o $@
+
+obj/%.d.o: src/%.d
+	ldc2 -c $< -of=$@
 
 .PHONY: clean
 clean:

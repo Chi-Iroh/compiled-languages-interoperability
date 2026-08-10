@@ -14,14 +14,13 @@ int main(int argc, char* argv[]) {
 
     asm_hello();
     c_hello();
-
     cbl_hello();
-
     cpp_hello();
 
     __managed__Startup();
     cs_hello();
 
+    d_hello();
     f90_hello();
     go_hello();
 
