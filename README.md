@@ -9,10 +9,12 @@ The program entry point is in C (`main()` function), and it calls individual fun
 - C++
 - C#
 - COBOL
+- D
 - FORTRAN
 - Go
 - Haskell
 - Rust
+- Zig
 
 # Run
 
