@@ -11,6 +11,7 @@ ADA_SRC = $(wildcard src/*.adb)
 CS_SRC = $(wildcard src/*.cs)
 CBL_SRC = $(wildcard src/*.cbl)
 D_SRC = $(wildcard src/*.d)
+ZIG_SRC = $(wildcard src/*.zig)
 
 C_OBJ = $(patsubst src/%.c,obj/%.c.o,$(C_SRC))
 CPP_OBJ = $(patsubst src/%.cpp,obj/%.cpp.o,$(CPP_SRC))
@@ -21,12 +22,13 @@ F90_OBJ = $(patsubst src/%.f90,obj/%.f90.o,$(F90_SRC))
 ADA_OBJ = $(patsubst src/%.adb,obj/%.o,$(ADA_SRC)) $(patsubst src/%.adb,obj/b~%.o,$(ADA_SRC))
 CBL_OBJ = $(patsubst src/%.cbl,obj/%.cbl.o,$(CBL_SRC))
 D_OBJ = $(patsubst src/%.d,obj/%.d.o,$(D_SRC))
+ZIG_OBJ = $(patsubst src/%.zig,obj/%.zig.o,$(ZIG_SRC))
 
 RS_LIB = $(patsubst src/%.rs,obj/%.rs.a,$(RS_SRC))
 GO_LIB = $(patsubst src/%.go,obj/%.go.a,$(GO_SRC))
 CS_LIB = $(patsubst src/%.cs,obj/%.cs.a,$(CS_SRC))
 
-OBJ = $(C_OBJ) $(CPP_OBJ) $(S_OBJ) $(HS_OBJ) $(F90_OBJ) $(ADA_OBJ) $(CBL_OBJ) $(D_OBJ)
+OBJ = $(C_OBJ) $(CPP_OBJ) $(S_OBJ) $(HS_OBJ) $(F90_OBJ) $(ADA_OBJ) $(CBL_OBJ) $(D_OBJ) $(ZIG_OBJ)
 LIB = $(RS_LIB) $(GO_LIB) $(CS_LIB)
 
 CS_RUNTIME=10
@@ -92,6 +94,9 @@ obj/%.cbl.o: src/%.cbl
 
 obj/%.d.o: src/%.d
 	ldc2 -c $< -of=$@
+
+obj/%.zig.o: src/%.zig
+	zig build-obj $< -fno-stack-check -femit-bin=$@
 
 .PHONY: clean
 clean:

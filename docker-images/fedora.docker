@@ -1,6 +1,6 @@
 FROM fedora
 
-RUN dnf install -y make dotnet-sdk-10.0 gfortran gnat gcobol rust go ghc nasm python3 which ldc
+RUN dnf install -y make dotnet-sdk-10.0 gfortran gnat gcobol rust go ghc nasm python3 which ldc zig
 
 WORKDIR /compiled-languages-interoperability
 COPY include include

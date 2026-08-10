@@ -29,4 +29,5 @@ int main(int argc, char* argv[]) {
     hs_exit();
 
     rs_hello();
+    zig_hello();
 }

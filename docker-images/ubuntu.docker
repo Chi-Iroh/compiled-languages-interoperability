@@ -1,7 +1,7 @@
 FROM ubuntu
 
 RUN apt update
-RUN apt install -y make dotnet-sdk-10.0 gfortran gcobol rust-all golang ghc nasm python3 gnu-which ldc
+RUN apt install -y make dotnet-sdk-10.0 gfortran gcobol rust-all golang ghc nasm python3 gnu-which ldc zig
 RUN apt install -y gnat-$(gcc -dumpversion)
 
 WORKDIR /compiled-languages-interoperability

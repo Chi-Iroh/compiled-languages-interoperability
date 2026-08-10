@@ -1,6 +1,6 @@
 FROM archlinux
 
-RUN pacman -Sy --noconfirm make dotnet-sdk gcc-fortran gcc-ada gcc-gcobol rust go ghc-static haskell-base-prelude nasm python3 which ldc
+RUN pacman -Sy --noconfirm make dotnet-sdk gcc-fortran gcc-ada gcc-gcobol rust go ghc-static haskell-base-prelude nasm python3 which ldc zig
 
 WORKDIR /compiled-languages-interoperability
 COPY include include
