@@ -12,6 +12,7 @@ CS_SRC = $(wildcard src/*.cs)
 CBL_SRC = $(wildcard src/*.cbl)
 D_SRC = $(wildcard src/*.d)
 ZIG_SRC = $(wildcard src/*.zig)
+HOLY_C_SRC = $(wildcard src/*.hc)
 
 C_OBJ = $(patsubst src/%.c,obj/%.c.o,$(C_SRC))
 CPP_OBJ = $(patsubst src/%.cpp,obj/%.cpp.o,$(CPP_SRC))
@@ -23,12 +24,13 @@ ADA_OBJ = $(patsubst src/%.adb,obj/%.o,$(ADA_SRC)) $(patsubst src/%.adb,obj/b~%.
 CBL_OBJ = $(patsubst src/%.cbl,obj/%.cbl.o,$(CBL_SRC))
 D_OBJ = $(patsubst src/%.d,obj/%.d.o,$(D_SRC))
 ZIG_OBJ = $(patsubst src/%.zig,obj/%.zig.o,$(ZIG_SRC))
+HOLY_C_OBJ = $(patsubst src/%.hc,obj/%.hc.o,$(HOLY_C_SRC))
 
 RS_LIB = $(patsubst src/%.rs,obj/%.rs.a,$(RS_SRC))
 GO_LIB = $(patsubst src/%.go,obj/%.go.a,$(GO_SRC))
 CS_LIB = $(patsubst src/%.cs,obj/%.cs.a,$(CS_SRC))
 
-OBJ = $(C_OBJ) $(CPP_OBJ) $(S_OBJ) $(HS_OBJ) $(F90_OBJ) $(ADA_OBJ) $(CBL_OBJ) $(D_OBJ) $(ZIG_OBJ)
+OBJ = $(C_OBJ) $(CPP_OBJ) $(S_OBJ) $(HS_OBJ) $(F90_OBJ) $(ADA_OBJ) $(CBL_OBJ) $(D_OBJ) $(ZIG_OBJ) $(HOLY_C_OBJ)
 LIB = $(RS_LIB) $(GO_LIB) $(CS_LIB)
 
 CS_RUNTIME=10
@@ -42,9 +44,18 @@ D_STD_LIB = -lphobos2-ldc-shared -ldruntime-ldc-shared
 
 GHC_LDFLAGS_OUTPUT = obj/ghc_ldflags.log
 
+DEPS_DIR = $(abspath deps)
+DEPS_REPOS_DIR = $(DEPS_DIR)/repos
+
+DEPS_BIN_DIR = $(DEPS_DIR)/bin
+DEPS_LIB_DIR = $(DEPS_DIR)/lib
+DEPS_INCLUDE_DIR = $(DEPS_DIR)/include
+
+HOLY_C_COMPILER = $(DEPS_BIN_DIR)/hcc
+
 EXE = a.out
 
-$(EXE): check-cs-nativeaot $(OBJ) $(LIB)
+$(EXE): init-deps-dir $(HOLY_C_COMPILER) check-cs-nativeaot $(OBJ) $(LIB)
 	gcc $(OBJ) -o $(EXE) -lstdc++ -no-pie -lgfortran $(LIB) -lgnat-$(shell gcc -dumpversion) -lm -lgcobol $(CS_STD_LIB) $(shell cat $(GHC_LDFLAGS_OUTPUT)) $(D_STD_LIB)
 
 obj/%.c.o: src/%.c
@@ -98,9 +109,19 @@ obj/%.d.o: src/%.d
 obj/%.zig.o: src/%.zig
 	zig build-obj $< -fno-stack-check -femit-bin=$@
 
+obj/%.hc.o: src/%.hc
+	$(HOLY_C_COMPILER) $< -obj -o $@
+
 .PHONY: clean
 clean:
 	rm -f $(OBJ) $(LIB) $(EXE)
+
+.PHONY: cleandeps
+cleandeps:
+	rm -rf $(DEPS_DIR)
+
+.PHONY: cleanall
+cleanall: cleandeps clean
 
 .PHONY: re
 re: clean $(EXE)
@@ -119,6 +140,20 @@ cs-download-nativeaot:
 	dotnet publish -p:PublishAot=true && \
 	cd - && \
 	rm $$dir -rf
+
+.PHONY: init-deps-dir
+init-deps-dir:
+	for dir in "$(DEPS_BIN_DIR)" "$(DEPS_INCLUDE_DIR)" "$(DEPS_LIB_DIR)"; do \
+		if ! [ -d "$$dir" ]; then \
+			mkdir -p "$$dir"; \
+		fi \
+	done
+
+$(HOLY_C_COMPILER):
+	mkdir -p $(DEPS_REPOS_DIR)
+	git clone https://github.com/Jamesbarford/holyc-lang.git $(DEPS_REPOS_DIR)/holyc-lang
+	INSTALL_PREFIX=$(DEPS_DIR) $(MAKE) -C $(DEPS_REPOS_DIR)/holyc-lang
+	$(MAKE) install -C $(DEPS_REPOS_DIR)/holyc-lang
 
 DOCKER_DISTRIBUTIONS=archlinux fedora ubuntu
 

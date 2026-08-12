@@ -12,3 +12,4 @@ void cs_hello(void);
 void cbl_hello(void);
 void d_hello(void);
 void zig_hello(void);
+void holyC_hello(void);

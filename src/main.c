@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
     d_hello();
     f90_hello();
     go_hello();
+    holyC_hello();
 
     hs_init(&argc, &argv);
     hs_hello();
