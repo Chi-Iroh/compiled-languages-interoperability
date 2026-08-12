@@ -22,9 +22,14 @@ The program entry point is in C (`main()` function), and it calls individual fun
 
 # Run
 
-On Fedora, install those packages :  
+Packages to install are listed in Docker images :  
+- [Arch Linux](docker-images/archlinux.docker)
+- [Fedora](docker-images/fedora.docker)
+- [Ubuntu](docker-images/ubuntu.docker)
+
+Then, simply do :  
 ```bash
-sudo dnf install dotnet-sdk-10.0 gfortran gnat gcobol rust go ghc
+make
 ```
 
 The build is tested with Docker images.  
