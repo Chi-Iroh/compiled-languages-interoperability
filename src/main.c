@@ -7,6 +7,9 @@ void adafinal(void);
 
 void __managed__Startup(void);
 
+void pascal_rtlInit(void);
+void pascal_rtlDone(void);
+
 int main(int argc, char* argv[]) {
     adainit();
     ada_hello();
@@ -28,6 +31,10 @@ int main(int argc, char* argv[]) {
     hs_init(&argc, &argv);
     hs_hello();
     hs_exit();
+
+    pascal_rtlInit();
+    pas_hello();
+    pascal_rtlDone();
 
     rs_hello();
     zig_hello();

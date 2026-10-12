@@ -8,17 +8,20 @@ The program entry point is in C (`main()` function), and it calls individual fun
 - C <img src="icons/C.png" height="30">
 - C++ <img src="icons/C++.png" height="30">
 - C# <img src="icons/C%23.png" height="30">
-- COBOL *
+- COBOL (didn't find any logo)
 - D <img src="icons/D.png" height="30">
 - FORTRAN <img src="icons/FORTRAN.png" height="30">
 - Go <img src="icons/Go.png" height="30">
 - Haskell <img src="icons/Haskell.png" height="30">
 - HolyC <img src="icons/HolyC.png" height="30">
+- Pascal (Unleashed) <img src="icons/Pascal Unleashed.png" height="50">
 - Rust <img src="icons/Rust.png" height="30">
 - Zig <img src="icons/Zig.png" height="30">
 
 <br>
-* I didn't find any logo
+
+For Pascal, special thanks to the people on Lazarus Pascal forum, for their help [here](https://forum.lazarus.freepascal.org/index.php/topic,74996.0.html), on a thread where I asked how to integrate Pascal in a static build.  
+Many thanks as well to the [Unleashed Pascal project](https://github.com/unleashedpascal/compiler/tree/feat/staticlib) which implemented static library generation, a feature I needed for my project, which lacks in the regular Free Pascal Compiler.  
 
 # Run
 
