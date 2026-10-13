@@ -1,6 +1,6 @@
 FROM fedora
 
-RUN dnf install -y git make cmake dotnet-sdk-10.0 gfortran gnat gcobol rust go ghc nasm python3 which ldc zig
+RUN dnf install -y git make cmake dotnet-sdk-10.0 gfortran gnat gcobol rust go ghc nasm python3 which ldc zig wget diffutils
 
 WORKDIR /compiled-languages-interoperability
 COPY include include
