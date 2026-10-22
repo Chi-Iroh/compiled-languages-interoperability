@@ -184,11 +184,11 @@ $(FPC_3_2_2):
 
 $(PASCAL_COMPILER): $(FPC_3_2_2)
 	if ! [ -d "$(DEPS_REPOS_DIR)/unleashedpascal" ]; then \
-		git clone -b feat/staticlib --single-branch https://github.com/unleashedpascal/compiler.git $(DEPS_REPOS_DIR)/unleashedpascal; \
+		git clone  https://github.com/unleashedpascal/compiler.git $(DEPS_REPOS_DIR)/unleashedpascal; \
 	else \
 		cd $(DEPS_REPOS_DIR)/unleashedpascal && git pull; \
 	fi
-	cd $(DEPS_REPOS_DIR)/unleashedpascal && git switch feat/staticlib
+	cd $(DEPS_REPOS_DIR)/unleashedpascal
 	PATH="$(DEPS_DIR)/fpc-3.2.2/bin:$$PATH" make all -C $(DEPS_REPOS_DIR)/unleashedpascal
 	mkdir -p $(DEPS_BIN_DIR)/unleashedpascal-rtl-units
 	PATH="$(DEPS_DIR)/fpc-3.2.2/bin:$$PATH" make INSTALL_PREFIX=$(DEPS_DIR) INSTALL_UNITDIR=$(DEPS_BIN_DIR)/unleashedpascal-rtl-units install -C $(DEPS_REPOS_DIR)/unleashedpascal
